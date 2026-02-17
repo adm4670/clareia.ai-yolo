@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Rotulagem YOLO – ENEM</title>
+
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: system-ui, sans-serif;
+      text-align: center;
+    }
+
+    h2 {
+      margin-top: 20px;
+    }
+
+    .container {
+      position: relative;
+      display: inline-block;
+    }
+
+    #image {
+      max-width: 900px;
+      border-radius: 8px;
+      display: block;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: crosshair;
+    }
+
+    button, select {
+      margin: 8px;
+      padding: 10px 16px;
+      font-size: 15px;
+      cursor: pointer;
+      border-radius: 6px;
+      border: none;
+    }
+
+    select {
+      background: #222;
+      color: #fff;
+    }
+
+    button {
+      background: #333;
+      color: #fff;
+    }
+
+    button:hover {
+      background: #555;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>🖊️ Rotulagem YOLO – Estrutura de Questões ENEM</h2>
+
+<label>
+  Classe atual:
+  <select id="classSelect">
+    <option value="0">🧩 Question Block</option>
+    <option value="1">📝 Statement (Texto)</option>
+    <option value="2">🖼️ Statement (Imagem)</option>
+    <option value="3">🔤 Alternative (Texto)</option>
+    <option value="4">🖼️ Alternative (Imagem)</option>
+  </select>
+</label>
+
+<br><br>
+
+<div class="container">
+  <img id="image" src="" alt="Imagem para rotulagem">
+  <canvas id="canvas"></canvas>
+</div>
+
+<br>
+
+<button id="nextBtn">➡️ Próxima</button>
+<button id="submitBtn">✅ Salvar Label</button>
+<button id="deleteBtn">🗑️ Descartar Imagem</button>
+
+<script>
+const image = document.getElementById("image");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const nextBtn = document.getElementById("nextBtn");
+const submitBtn = document.getElementById("submitBtn");
+const deleteBtn = document.getElementById("deleteBtn");
+const classSelect = document.getElementById("classSelect");
+
+const BACKEND_NEXT   = "http://localhost:8000/next";
+const BACKEND_LABEL  = "http://localhost:8000/label";
+const BACKEND_DELETE = "http://localhost:8000/delete";
+
+let boxes = [];
+let startX = 0, startY = 0;
+let isDrawing = false;
+let currentFilename = "";
+
+// ===========================
+// Cores por classe
+// ===========================
+const CLASS_COLORS = {
+  0: "#ff3b3b",
+  1: "#3bff6f",
+  2: "#3bd9ff",
+  3: "#ffe93b",
+  4: "#ff3bda"
+};
+
+const CLASS_NAMES = {
+  0: "question_block",
+  1: "statement_text",
+  2: "statement_image",
+  3: "alternative_text",
+  4: "alternative_image"
+};
+
+// ===========================
+// Canvas
+// ===========================
+function resizeCanvas() {
+  canvas.width = image.width;
+  canvas.height = image.height;
+  drawBoxes();
+}
+
+function drawBoxes() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.setLineDash([]);
+
+  boxes.forEach((b, idx) => {
+    ctx.strokeStyle = CLASS_COLORS[b.class_id];
+    ctx.lineWidth = 2;
+    ctx.strokeRect(b.x, b.y, b.w, b.h);
+
+    ctx.fillStyle = CLASS_COLORS[b.class_id];
+    ctx.font = "12px sans-serif";
+    ctx.fillText(
+      `${idx + 1} - ${CLASS_NAMES[b.class_id]}`,
+      b.x + 4,
+      b.y + 14
+    );
+  });
+}
+
+// ===========================
+// Mouse
+// ===========================
+canvas.addEventListener("mousedown", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  startX = e.clientX - rect.left;
+  startY = e.clientY - rect.top;
+  isDrawing = true;
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if (!isDrawing) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  drawBoxes();
+
+  ctx.setLineDash([6, 4]);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "#00FFFF";
+  ctx.fillStyle = "rgba(0,255,255,0.15)";
+
+  ctx.strokeRect(startX, startY, x - startX, y - startY);
+  ctx.fillRect(startX, startY, x - startX, y - startY);
+});
+
+canvas.addEventListener("mouseup", (e) => {
+  if (!isDrawing) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  boxes.push({
+    x: startX,
+    y: startY,
+    w: x - startX,
+    h: y - startY,
+    class_id: Number(classSelect.value)
+  });
+
+  isDrawing = false;
+  ctx.setLineDash([]);
+  drawBoxes();
+});
+
+// ===========================
+// CTRL + Z (Undo)
+// ===========================
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.key === "z") {
+    if (isDrawing) return;
+    if (boxes.length === 0) return;
+
+    boxes.pop();
+    drawBoxes();
+  }
+});
+
+// ===========================
+// Backend
+// ===========================
+async function loadNextImage() {
+  const res = await fetch(BACKEND_NEXT);
+  const data = await res.json();
+
+  if (data.status === "empty") {
+    alert("✅ Todas as imagens foram rotuladas!");
+    image.src = "";
+    canvas.width = canvas.height = 0;
+    boxes = [];
+    currentFilename = "";
+    return;
+  }
+
+  image.src = data.image;
+  currentFilename = data.filename;
+  boxes = [];
+
+  image.onload = resizeCanvas;
+}
+
+async function submitLabels() {
+  if (!currentFilename) return;
+
+  const labels = boxes.map(b => ({
+    class_id: b.class_id,
+    x: (b.x + b.w / 2) / canvas.width,
+    y: (b.y + b.h / 2) / canvas.height,
+    w: b.w / canvas.width,
+    h: b.h / canvas.height
+  }));
+
+  await fetch(BACKEND_LABEL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ filename: currentFilename, labels })
+  });
+
+  loadNextImage();
+}
+
+async function deleteImage() {
+  if (!currentFilename) return;
+
+  await fetch(BACKEND_DELETE, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ filename: currentFilename })
+  });
+
+  loadNextImage();
+}
+
+nextBtn.onclick = loadNextImage;
+submitBtn.onclick = submitLabels;
+deleteBtn.onclick = deleteImage;
+
+// Init
+loadNextImage();
+</script>
+
+</body>
+</html>

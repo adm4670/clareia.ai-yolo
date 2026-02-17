@@ -305,3 +305,7 @@ Essas métricas impactam diretamente a qualidade do Markdown final.
 ## 14. Observação Final
 
 Este pipeline foi desenhado para **uso em produção**, com foco em qualidade estrutural e escalabilidade, sendo especialmente adequado para plataformas educacionais baseadas em ENEM, como pipelines de extração, organização e geração de conteúdo pedagógico estruturado.
+
+
+
+uvicorn backend:app --reload
