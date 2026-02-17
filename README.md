@@ -308,4 +308,72 @@ Este pipeline foi desenhado para **uso em produção**, com foco em qualidade es
 
 
 
+
+# 🎯 PRIORIDADE ÚNICA DO DIA  
+**Data:** 17/02/2026
+
+## ❓ Pergunta-âncora
+### **Qual é a ÚNICA coisa que faz a clareia.ai avançar hoje?**
+
+---
+
+## ✅ PRIORIDADE DEFINIDA
+
+> **Implementar o pipeline de extração e formatação de PDF → Markdown utilizando rotulagens já existentes do YOLO (sem treinamento), validando se a estrutura final reproduz o layout original com precisão próxima de 100%.**
+
+---
+
+## 🧠 CONTEXTO (POR QUE ISSO IMPORTA)
+
+- Elimina um risco técnico central do produto  
+- Valida a hipótese de preservação de **layout + semântica**  
+- Destrava a automação real da base de questões  
+- Evita distrações com treino prematuro de modelo  
+
+---
+
+## ⚙️ ESCOPO EXATO DA AÇÃO
+
+### ✅ Fazer
+- Utilizar **rotulagens já realizadas no YOLO**
+- Não realizar treinamento de modelo
+- Implementar o pipeline de:
+  1. Leitura do PDF  
+  2. Associação bloco → rótulo  
+  3. Ordenação espacial (layout-aware)  
+  4. Geração de Markdown estruturado  
+
+### ❌ Não fazer
+- Treinar YOLO  
+- Ajustar dataset  
+- Melhorar acurácia do detector  
+- Refinar estética além do essencial  
+
+---
+
+## 📦 OUTPUT ESPERADO (CRITÉRIO BINÁRIO)
+
+- [ ] Markdown gerado automaticamente  
+- [ ] Estrutura fiel ao PDF original  
+- [ ] Ordem correta dos elementos  
+- [ ] Referências corretas de imagens  
+- [ ] Precisão visual/estrutural ≈ **100%**
+
+> Se o Markdown representa o PDF de forma confiável → **o dia venceu**.
+
+---
+
+## 🚨 REGRA DE DECISÃO
+
+- Se funcionar **sem treinamento**, o caminho está validado  
+- Se não funcionar, o problema é **arquitetura**, não modelo  
+
+---
+
+> **Feito gera clareza. Clareza gera dinheiro.**
+
+
+
+
+
 uvicorn backend:app --reload
