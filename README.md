@@ -370,6 +370,55 @@ Este pipeline foi desenhado para **uso em produção**, com foco em qualidade es
 
 ---
 
+# 🎯 PRIORIDADE ÚNICA DO DIA  
+**Data:** 19/02/2026
+
+## ❓ Pergunta-âncora
+### **Qual é a ÚNICA coisa que faz a clareia.ai avançar hoje?**
+
+---
+
+## ✅ PRIORIDADE DEFINIDA
+
+> **Testar o pipeline de PDF → Markdown usando apenas rotulagens YOLO existentes, garantindo que o layout e a ordem dos elementos sejam preservados.**
+
+---
+
+## ⚙️ ESCOPO SIMPLIFICADO
+
+### ✅ Fazer
+- Usar **rotulagens YOLO já existentes**  
+- Implementar pipeline básico:
+  1. Ler PDF  
+  2. Mapear blocos com rótulos  
+  3. Ordenar elementos pelo layout  
+  4. Gerar Markdown fiel ao PDF  
+
+### ❌ Não fazer
+- Treinar YOLO  
+- Ajustar dataset  
+- Melhorar detector ou estética  
+- Qualquer refinamento não essencial  
+
+---
+
+## 📦 OUTPUT ESPERADO
+
+- [ ] Markdown gerado automaticamente  
+- [ ] Estrutura fiel ao PDF  
+- [ ] Ordem correta dos elementos  
+- [ ] Referências de imagens corretas  
+- [ ] Precisão visual ≈ **100%**
+
+> Markdown confiável = dia **vencido** ✅
+
+---
+
+## 🚨 DECISÃO RÁPIDA
+
+- Pipeline funciona sem treinamento → validação concluída  
+- Pipeline falha → foco em **arquitetura**, não modelo  
+
 > **Feito gera clareza. Clareza gera dinheiro.**
 
 
